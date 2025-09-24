@@ -98,6 +98,7 @@
 
 #include "sensors/acceleration.h"
 #include "sensors/barometer.h"
+#include "sensors/sensors.h"
 #include "sensors/battery.h"
 #include "sensors/boardalignment.h"
 #include "sensors/compass.h"
@@ -435,6 +436,15 @@ void updateArmingStatus(void)
 
 void disarm(flightLogDisarmReason_e reason)
 {
+
+    if (sensors(SENSOR_BARO)){
+        int32_t alttitude = getBaroAltitude();
+
+        if (alttitude>50){
+            return;
+        }
+    }
+
     if (ARMING_FLAG(ARMED)) {
         if (!flipOverAfterCrashActive) {
             ENABLE_ARMING_FLAG(WAS_EVER_ARMED);
