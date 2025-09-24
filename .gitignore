@@ -19,8 +19,7 @@
 
 /downloads/
 /tools/
-/mk/
-/lib/
+/obj/
 # Libraries
 *.lib
 *.a
