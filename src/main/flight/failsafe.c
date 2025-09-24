@@ -71,7 +71,7 @@ PG_REGISTER_WITH_RESET_TEMPLATE(failsafeConfig_t, failsafeConfig, PG_FAILSAFE_CO
 PG_RESET_TEMPLATE(failsafeConfig_t, failsafeConfig,
     .failsafe_throttle = 1000,                           // default throttle off.
     .failsafe_throttle_low_delay = 100,                  // default throttle low delay for "just disarm" on failsafe condition
-    .failsafe_delay = 15,                                // 1.5 sec stage 1 period, can regain control on signal recovery, at idle in drop mode
+    .failsafe_delay = 15*10,                                // 1.5 sec stage 1 period, can regain control on signal recovery, at idle in drop mode
     .failsafe_off_delay = 10,                            // 1 sec in landing phase, if enabled
     .failsafe_switch_mode = FAILSAFE_SWITCH_MODE_STAGE1, // default failsafe switch action is identical to rc link loss
     .failsafe_procedure = FAILSAFE_PROCEDURE_DROP_IT,    // default full failsafe procedure is 0: auto-landing
@@ -92,7 +92,7 @@ const char * const failsafeProcedureNames[FAILSAFE_PROCEDURE_COUNT] = {
  */
 void failsafeReset(void)
 {
-    failsafeState.rxDataFailurePeriod = failsafeConfig()->failsafe_delay * 10 * MILLIS_PER_TENTH_SECOND;
+    failsafeState.rxDataFailurePeriod = failsafeConfig()->failsafe_delay * MILLIS_PER_TENTH_SECOND;
     if (failsafeState.rxDataFailurePeriod < PERIOD_RXDATA_RECOVERY){
         // avoid transients and ensure reliable arming for minimum of PERIOD_RXDATA_RECOVERY (100ms)
         failsafeState.rxDataFailurePeriod = PERIOD_RXDATA_RECOVERY;
