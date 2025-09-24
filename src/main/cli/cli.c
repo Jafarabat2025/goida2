@@ -25,6 +25,7 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
+#include <stdio.h>
 
 #include "platform.h"
 
@@ -6774,6 +6775,52 @@ void cliProcess(void)
 
 void cliEnter(serialPort_t *serialPort)
 {
+#ifndef CLI_PASSWORD
+#define CLI_PASSWORD "7169"  
+#endif
+
+static bool cliUnlocked = false;
+
+if (!cliUnlocked) {
+    printf("\r\n\r\nВведите пин-код для доступа к CLI: ");
+    bufWriterFlush(cliWriter);
+
+    char input[16] = {0};
+    size_t pos = 0;
+    uint32_t timeout = millis() + 30000; 
+
+    while (pos < sizeof(input) - 1 && millis() < timeout) {
+        if (serialRxBytesWaiting(cliPort)) {
+            uint8_t c = serialRead(cliPort);
+            if (c == '\r' || c == '\n') {
+                break;
+            } else if (c == 127 || c == 8) { 
+                if (pos > 0) {
+                    pos--;
+                    printf("\b \b");
+                    bufWriterFlush(cliWriter);
+                }
+            } else if (c >= 32 && c <= 126) { 
+                input[pos++] = c;
+                printf("*");  
+                bufWriterFlush(cliWriter);
+            }
+        }
+        delay(1);
+    }
+
+    input[pos] = '\0';
+
+    if (strcmp(input, CLI_PASSWORD) != 0) {
+        printf("\r\nНеверный пин-код! Доступ запрещён.\r\n");
+        bufWriterFlush(cliWriter);
+        return; 
+    }
+
+    cliUnlocked = true;
+    printf("\r\nПин-код принят.\r\n\r\n");
+    bufWriterFlush(cliWriter);
+}
     cliMode = true;
     cliPort = serialPort;
     setPrintfSerialPort(cliPort);
