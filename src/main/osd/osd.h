@@ -18,6 +18,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+ //comment
 #pragma once
 
 #include "common/time.h"
@@ -413,3 +414,13 @@ void osdSetVisualBeeperState(bool state);
 statistic_t *osdGetStats(void);
 bool osdNeedsAccelerometer(void);
 int osdPrintFloat(char *buffer, char leadingSymbol, float value, char *formatString, unsigned decimalPlaces, bool round, char trailingSymbol);
+extern bool osdBackgroundDimmed;
+
+typedef struct {
+    uint8_t x;      
+    uint8_t y;      
+    uint8_t width;  
+    uint8_t height; 
+} osdWindow_t;
+
+extern osdWindow_t osdViewport;

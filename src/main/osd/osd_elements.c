@@ -715,7 +715,7 @@ static void osdElementAntiGravity(osdElementParms_t *element)
 
 #ifdef USE_ACC
 
-static void osdElementArtificialHorizon(osdElementParms_t *element)
+static void osdElementArtificialHorizon(osdElementParms_t *element) //Гироскоп
 {
     static int x = -4;
     // Get pitch and roll limits in tenths of degrees
@@ -915,7 +915,7 @@ static void osdElementCrashFlipArrow(osdElementParms_t *element)
 }
 #endif // USE_ACC
 
-static void osdElementCrosshairs(osdElementParms_t *element)
+static void osdElementCrosshairs(osdElementParms_t *element) //Центральный прицел
 {
     element->buff[0] = SYM_AH_CENTER_LINE;
     element->buff[1] = SYM_AH_CENTER;
@@ -1086,6 +1086,19 @@ static void osdElementGpsFlightDistance(osdElementParms_t *element)
 
 static void osdElementGpsHomeDirection(osdElementParms_t *element)
 {
+    if (element->elemPosX >= osdViewport.x && 
+        element->elemPosX < osdViewport.x + osdViewport.width &&
+        element->elemPosY >= osdViewport.y && 
+        element->elemPosY < osdViewport.y + osdViewport.height) {
+        
+        element->buff[0] = '\0';
+        return;
+    }
+
+    if (osdBackgroundDimmed) {
+        element->buff[0] = '\0'; 
+        return;
+    }
     if (STATE(GPS_FIX) && STATE(GPS_FIX_HOME)) {
         if (GPS_distanceToHome > 0) {
             int direction = GPS_directionToHome;
@@ -1110,6 +1123,19 @@ static void osdElementGpsHomeDirection(osdElementParms_t *element)
 
 static void osdElementGpsHomeDistance(osdElementParms_t *element)
 {
+    if (element->elemPosX >= osdViewport.x && 
+        element->elemPosX < osdViewport.x + osdViewport.width &&
+        element->elemPosY >= osdViewport.y && 
+        element->elemPosY < osdViewport.y + osdViewport.height) {
+        
+        element->buff[0] = '\0';
+        return;
+    }
+
+    if (osdBackgroundDimmed) {
+        element->buff[0] = '\0'; // Пустая строка = не рисовать
+        return;
+    }
     if (STATE(GPS_FIX) && STATE(GPS_FIX_HOME)) {
         int distance = GPS_distanceToHome;
 #ifdef USE_GPS_LAP_TIMER
@@ -1163,7 +1189,7 @@ static void osdElementGpsSats(osdElementParms_t *element)
     }
 }
 
-static void osdElementGpsSpeed(osdElementParms_t *element)
+static void osdElementGpsSpeed(osdElementParms_t *element) //скорость по gps
 {
     if (STATE(GPS_FIX)) {
         tfp_sprintf(element->buff, "%c%3d%c", SYM_SPEED, osdGetSpeedToSelectedUnit(gpsConfig()->gps_use_3d_speed ? gpsSol.speed3d : gpsSol.groundSpeed), osdGetSpeedToSelectedUnitSymbol());
@@ -1660,7 +1686,7 @@ static void osdElementTimer(osdElementParms_t *element)
 }
 
 #ifdef USE_VTX_COMMON
-static void osdElementVtxChannel(osdElementParms_t *element)
+static void osdElementVtxChannel(osdElementParms_t *element) //канад видеопередачи
 {
     const vtxDevice_t *vtxDevice = vtxCommonDevice();
     uint8_t band = vtxSettingsConfigMutable()->band;
