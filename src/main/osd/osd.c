@@ -103,6 +103,13 @@
 #ifdef USE_HARDWARE_REVISION_DETECTION
 #include "hardware_revision.h"
 #endif
+bool osdBackgroundDimmed = false;
+osdWindow_t osdViewport = {
+    .x = 10,
+    .y = 5,
+    .width = 10,
+    .height = 6
+};
 
 typedef enum {
     OSD_LOGO_ARMING_OFF,
@@ -1488,6 +1495,20 @@ void osdUpdate(timeUs_t currentTimeUs)
             // Background layer not supported, just clear the foreground in preparation
             // for drawing the elements including their backgrounds.
             displayClearScreen(osdDisplayPort, DISPLAY_CLEAR_NONE);
+            osdBackgroundDimmed = false;
+            const uint8_t screenWidth = osdDisplayPort->cols;
+            const uint8_t screenHeight = osdDisplayPort->rows;
+            const uint8_t fillWidth = (screenWidth * 3) / 4; // 75%
+
+            for (uint8_t y = 0; y < screenHeight; y++) {
+                for (uint8_t x = 0; x < fillWidth; x++) {
+                    if (x >= osdViewport.x && x < osdViewport.x + osdViewport.width && y >= osdViewport.y &&  y < osdViewport.y + osdViewport.height) {
+                        continue;
+                    }
+                    displayWriteChar(osdDisplayPort, x, y, 0, 129);                
+                }
+            }
+            osdBackgroundDimmed = true;
         }
 
 #ifdef USE_GPS
