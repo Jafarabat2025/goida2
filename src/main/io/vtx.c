@@ -52,10 +52,10 @@ PG_REGISTER_WITH_RESET_FN(vtxSettingsConfig_t, vtxSettingsConfig, PG_VTX_SETTING
 void pgResetFn_vtxSettingsConfig(vtxSettingsConfig_t *vtxSettingsConfig)
 {
 #ifdef USE_VTX_TABLE
-    vtxSettingsConfig->band = 0;
-    vtxSettingsConfig->channel = 0;
-    vtxSettingsConfig->power = 0;
-    vtxSettingsConfig->freq = 0;
+    vtxSettingsConfig->band = 1;
+    vtxSettingsConfig->channel = 1;
+    vtxSettingsConfig->power = 1;
+    vtxSettingsConfig->freq = vtxCommonLookupFrequency(vtxCommonDevice(), 1, 1);
 #else
     vtxSettingsConfig->freq = VTX_TABLE_DEFAULT_FREQ;
     vtxSettingsConfig->band = VTX_TABLE_DEFAULT_BAND;
