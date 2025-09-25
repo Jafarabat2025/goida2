@@ -6795,3 +6795,4 @@ void cliEnter(serialPort_t *serialPort)
 }
 
 #endif // USE_CLI
+

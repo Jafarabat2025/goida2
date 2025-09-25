@@ -18,6 +18,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+ //comment
 #pragma once
 
 #include "common/time.h"
