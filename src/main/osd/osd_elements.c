@@ -817,8 +817,8 @@ static void osdBackgroundCameraFrame(osdElementParms_t *element)
     const uint8_t xpos = element->elemPosX;
     const uint8_t ypos = element->elemPosY;
 
-    const uint8_t screenWidth  = osdGetScreenColumns();
-    const uint8_t screenHeight = osdGetScreenRows();
+     const uint8_t screenWidth = constrain(osdConfig()->camera_frame_width, OSD_CAMERA_FRAME_MIN_WIDTH, OSD_CAMERA_FRAME_MAX_WIDTH);
+    const uint8_t screenHeight = constrain(osdConfig()->camera_frame_height, OSD_CAMERA_FRAME_MIN_HEIGHT, OSD_CAMERA_FRAME_MAX_HEIGHT);
 
     const uint8_t winX = 10;   // позиция окна X
     const uint8_t winY = 6;    // позиция окна Y
@@ -840,7 +840,7 @@ static void osdBackgroundCameraFrame(osdElementParms_t *element)
                 (ypos + i) >= winY && (ypos + i) < (winY + winH)) {
                 continue; 
             }
-            osdDisplayWriteChar(element, x, ypos + i, DISPLAYPORT_SEVERITY_NORMAL, maskChar);
+            osdDisplayWriteChar(element, xpos, ypos + i, DISPLAYPORT_SEVERITY_NORMAL, maskChar);
         }
 
         element->drawElement = false;  // element already drawn
