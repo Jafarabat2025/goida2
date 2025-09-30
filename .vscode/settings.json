@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "spektrum_vtx_control.h": "c"
+        "spektrum_vtx_control.h": "c",
+        "cstdint": "c"
     }
 }

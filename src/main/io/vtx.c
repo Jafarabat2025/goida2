@@ -46,6 +46,7 @@
 
 #include "vtx.h"
 
+
 PG_REGISTER_WITH_RESET_FN(vtxSettingsConfig_t, vtxSettingsConfig, PG_VTX_SETTINGS_CONFIG, 1);
 
 void pgResetFn_vtxSettingsConfig(vtxSettingsConfig_t *vtxSettingsConfig)
@@ -139,7 +140,7 @@ STATIC_UNIT_TESTED vtxSettingsConfig_t vtxGetSettings(void)
 
 static bool vtxProcessBandAndChannel(vtxDevice_t *vtxDevice)
 {
-    //if (!ARMING_FLAG(ARMED)) {
+    if (!ARMING_FLAG(ARMED)) {
         uint8_t vtxBand;
         uint8_t vtxChan;
         if (vtxCommonGetBandAndChannel(vtxDevice, &vtxBand, &vtxChan)) {
@@ -149,14 +150,14 @@ static bool vtxProcessBandAndChannel(vtxDevice_t *vtxDevice)
                 return true;
             }
         }
-    //}
+    }
     return false;
 }
 
 #if defined(VTX_SETTINGS_FREQCMD)
 static bool vtxProcessFrequency(vtxDevice_t *vtxDevice)
 {
-    //if (!ARMING_FLAG(ARMED)) {
+    if (!ARMING_FLAG(ARMED)) {
         uint16_t vtxFreq;
         if (vtxCommonGetFrequency(vtxDevice, &vtxFreq)) {
             const vtxSettingsConfig_t settings = vtxGetSettings();
@@ -165,7 +166,7 @@ static bool vtxProcessFrequency(vtxDevice_t *vtxDevice)
                 return true;
             }
         }
-    //}
+    }
     return false;
 }
 #endif
@@ -188,7 +189,7 @@ static bool vtxProcessPitMode(vtxDevice_t *vtxDevice)
     static bool prevPmSwitchState = false;
 
     unsigned vtxStatus;
-    if (vtxCommonGetStatus(vtxDevice, &vtxStatus)) { //!ARMING_FLAG(ARMED) && 
+    if (!ARMING_FLAG(ARMED) && vtxCommonGetStatus(vtxDevice, &vtxStatus)) {
         bool currPmSwitchState = IS_RC_MODE_ACTIVE(BOXVTXPITMODE);
 
         if (currPmSwitchState != prevPmSwitchState) {
