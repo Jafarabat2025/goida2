@@ -437,13 +437,17 @@ void updateArmingStatus(void)
 void disarm(flightLogDisarmReason_e reason)
 {
 
-    if (sensors(SENSOR_BARO)){
-        int32_t alttitude = getBaroAltitude();
-
-        if (alttitude>50){
-            return;
-        }
+    if (rcCommand[THROTTLE]>1200){
+        return;
     }
+
+    // if (sensors(SENSOR_BARO)){
+    //     int32_t alttitude = getBaroAltitude();
+
+    //     if (alttitude>50){
+    //         return;
+    //     }
+    // }
 
     if (ARMING_FLAG(ARMED)) {
         if (!flipOverAfterCrashActive) {
