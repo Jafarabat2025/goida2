@@ -816,8 +816,16 @@ static void osdBackgroundCameraFrame(osdElementParms_t *element)
     static enum {TOP, MIDDLE, BOTTOM} renderPhase = TOP;
     const uint8_t xpos = element->elemPosX;
     const uint8_t ypos = element->elemPosY;
-    const uint8_t width = constrain(osdConfig()->camera_frame_width, OSD_CAMERA_FRAME_MIN_WIDTH, OSD_CAMERA_FRAME_MAX_WIDTH);
-    const uint8_t height = constrain(osdConfig()->camera_frame_height, OSD_CAMERA_FRAME_MIN_HEIGHT, OSD_CAMERA_FRAME_MAX_HEIGHT);
+
+    const uint8_t screenWidth  = osdGetScreenColumns();
+    const uint8_t screenHeight = osdGetScreenRows();
+
+    const uint8_t winX = 10;   // позиция окна X
+    const uint8_t winY = 6;    // позиция окна Y
+    const uint8_t winW = 12;   // ширина окна
+    const uint8_t winH = 8;    // высота окна
+
+    const uint8_t maskChar = 0x7F;
 
     if (renderPhase != BOTTOM) {
         // Rendering not yet complete
@@ -825,29 +833,32 @@ static void osdBackgroundCameraFrame(osdElementParms_t *element)
     }
 
     if (renderPhase == MIDDLE) {
-        static uint8_t i = 1;
+        static uint8_t i = 0;
 
-        osdDisplayWriteChar(element, xpos, ypos + i, DISPLAYPORT_SEVERITY_NORMAL, SYM_STICK_OVERLAY_VERTICAL);
-        osdDisplayWriteChar(element, xpos + width - 1, ypos + i, DISPLAYPORT_SEVERITY_NORMAL, SYM_STICK_OVERLAY_VERTICAL);
+        for (uint8_t x = 0; x < screenWidth; x++) {
+            if (x >= winX && x < (winX + winW) &&
+                (ypos + i) >= winY && (ypos + i) < (winY + winH)) {
+                continue; 
+            }
+            osdDisplayWriteChar(element, x, ypos + i, DISPLAYPORT_SEVERITY_NORMAL, maskChar);
+        }
 
         element->drawElement = false;  // element already drawn
 
-        if (++i == height) {
-            i = 1;
+        if (++i == screenHeight) {
+            i = 0;
             renderPhase = BOTTOM;
         }
     } else {
-        element->buff[0] = SYM_STICK_OVERLAY_CENTER;
-        for (uint8_t i = 1; i < (width - 1); i++) {
-            element->buff[i] = SYM_STICK_OVERLAY_HORIZONTAL;
+        for (uint8_t i = 0; i < screenWidth; i++) {
+            element->buff[i] = maskChar;
         }
-        element->buff[width - 1] = SYM_STICK_OVERLAY_CENTER;
-        element->buff[width] = 0;  // string terminator
+        element->buff[screenWidth] = 0; 
 
         if (renderPhase == TOP) {
             renderPhase = MIDDLE;
         } else {
-            element->elemOffsetY = height - 1;
+            element->elemOffsetY = screenHeight - 1;
             renderPhase = TOP;
         }
     }
