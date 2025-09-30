@@ -825,7 +825,7 @@ static void osdBackgroundCameraFrame(osdElementParms_t *element)
     const uint8_t winW = 12;   // ширина окна
     const uint8_t winH = 8;    // высота окна
 
-    const uint8_t maskChar = 0x7F;
+    const uint8_t maskChar = 128;
 
     if (renderPhase != BOTTOM) {
         // Rendering not yet complete
