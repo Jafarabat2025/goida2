@@ -6772,60 +6772,14 @@ void cliProcess(void)
         processCharacterInteractive(c);
     }
 }
-static bool cliUnlocked = false;
 
 void cliEnter(serialPort_t *serialPort)
 {
-#ifndef CLI_PASSWORD
-#define CLI_PASSWORD "7169"  
-#endif
-
- cliPort = serialPort;
- setPrintfSerialPort(cliPort);
- bufWriterInit(&cliWriterDesc, cliWriteBuffer, sizeof(cliWriteBuffer), (bufWrite_t)serialWriteBufBlockingShim, serialPort);
- cliErrorWriter = cliWriter = &cliWriterDesc;
-
-if (!cliUnlocked) {
-    printf("\r\n\r\nВведите пин-код для доступа к CLI: ");
-    bufWriterFlush(cliWriter);
-
-    char input[16] = {0};
-    size_t pos = 0;
-    uint32_t timeout = millis() + 30000; 
-
-    while (pos < sizeof(input) - 1 && millis() < timeout) {
-        if (serialRxBytesWaiting(serialPort)) {
-            uint8_t c = serialRead(serialPort);
-            if (c == '\r' || c == '\n') {
-                break;
-            } else if (c == 127 || c == 8) { 
-                if (pos > 0) {
-                    pos--;
-                    printf("\b \b");
-                    bufWriterFlush(cliWriter);
-                }
-            } else if (c >= 32 && c <= 126) { 
-                input[pos++] = c;
-                printf("*");  
-                bufWriterFlush(cliWriter);
-            }
-        }
-        delay(1);
-    }
-
-    input[pos] = '\0';
-
-    if (strcmp(input, CLI_PASSWORD) != 0) {
-        printf("\r\nНеверный пин-код! Доступ запрещён.\r\n");
-        bufWriterFlush(cliWriter);
-        return; 
-    }
-
-    cliUnlocked = true;
-    printf("\r\nПин-код принят.\r\n\r\n");
-    bufWriterFlush(cliWriter);
-}
     cliMode = true;
+    cliPort = serialPort;
+    setPrintfSerialPort(cliPort);
+    bufWriterInit(&cliWriterDesc, cliWriteBuffer, sizeof(cliWriteBuffer), (bufWrite_t)serialWriteBufBlockingShim, serialPort);
+    cliErrorWriter = cliWriter = &cliWriterDesc;
 
 #ifndef MINIMAL_CLI
     cliPrintLine("\r\nEntering CLI Mode, type 'exit' to return, or 'help'");
@@ -6842,28 +6796,4 @@ if (!cliUnlocked) {
 }
 
 #endif // USE_CLI
-
-// void cliEnter(serialPort_t *serialPort)
-// {
-//     cliMode = true;
-//     cliPort = serialPort;
-//     setPrintfSerialPort(cliPort);
-//     bufWriterInit(&cliWriterDesc, cliWriteBuffer, sizeof(cliWriteBuffer), (bufWrite_t)serialWriteBufBlockingShim, serialPort);
-//     cliErrorWriter = cliWriter = &cliWriterDesc;
-
-// #ifndef MINIMAL_CLI
-//     cliPrintLine("\r\nEntering CLI Mode, type 'exit' to return, or 'help'");
-// #else
-//     cliPrintLine("\r\nCLI");
-// #endif
-//     setArmingDisabled(ARMING_DISABLED_CLI);
-
-//     cliPrompt();
-
-// #ifdef USE_CLI_BATCH
-//     resetCommandBatch();
-// #endif
-// }
-
-// #endif // USE_CLI
 
